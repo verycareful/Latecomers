@@ -8,6 +8,7 @@ import { Layout } from '@/components/Layout';
 import { Login, ProtectedRoute } from '@/components/Auth';
 import { Dashboard } from '@/components/Dashboard';
 import { AllStudents } from '@/components/Students';
+import { AdminPanel } from '@/components/Admin/AdminPanel';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -41,7 +42,7 @@ function App() {
                 >
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/students" element={<AllStudents />} />
-                  {/* Add more protected routes here */}
+                  <Route path="/admin" element={<AdminPanel />} />
                 </Route>
 
                 {/* Catch-all redirect */}

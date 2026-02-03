@@ -115,10 +115,10 @@ export function StudentDetailsModal({
                     </div>
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Year
+                        Batch
                       </dt>
                       <dd className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-                        Year {data.student.year}
+                        {data.student.batch}
                       </dd>
                     </div>
                     <div>
@@ -137,14 +137,7 @@ export function StudentDetailsModal({
                         Section {data.student.section}
                       </dd>
                     </div>
-                    <div>
-                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                        Batch
-                      </dt>
-                      <dd className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-                        {data.student.batch}
-                      </dd>
-                    </div>
+
                   </div>
                 </div>
 
@@ -157,27 +150,72 @@ export function StudentDetailsModal({
                     </span>
                   </h4>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    <div className={cn(
+                      "rounded-lg p-4 text-center",
+                      data.totalLateCount === 0
+                        ? "bg-green-50 dark:bg-green-900/20"
+                        : "bg-red-50 dark:bg-red-900/20"
+                    )}>
+                      <p className={cn(
+                        "text-2xl font-bold",
+                        data.totalLateCount === 0
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-red-600 dark:text-red-400"
+                      )}>
                         {data.totalLateCount}
                       </p>
-                      <p className="text-xs text-red-600/70 dark:text-red-400/70 mt-1">
+                      <p className={cn(
+                        "text-xs mt-1",
+                        data.totalLateCount === 0
+                          ? "text-green-600/70 dark:text-green-400/70"
+                          : "text-red-600/70 dark:text-red-400/70"
+                      )}>
                         Total Late Days
                       </p>
                     </div>
-                    <div className="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                        {formatLateness(data.totalLatenessMinutes)}
+                    <div className={cn(
+                      "rounded-lg p-4 text-center",
+                      data.totalLatenessMinutes === 0
+                        ? "bg-green-50 dark:bg-green-900/20"
+                        : "bg-orange-50 dark:bg-orange-900/20"
+                    )}>
+                      <p className={cn(
+                        "text-2xl font-bold",
+                        data.totalLatenessMinutes === 0
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-orange-600 dark:text-orange-400"
+                      )}>
+                        {data.totalLatenessMinutes === 0 ? 'On time' : formatLateness(data.totalLatenessMinutes)}
                       </p>
-                      <p className="text-xs text-orange-600/70 dark:text-orange-400/70 mt-1">
+                      <p className={cn(
+                        "text-xs mt-1",
+                        data.totalLatenessMinutes === 0
+                          ? "text-green-600/70 dark:text-green-400/70"
+                          : "text-orange-600/70 dark:text-orange-400/70"
+                      )}>
                         Total Lateness
                       </p>
                     </div>
-                    <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 text-center">
-                      <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                        {formatLateness(data.averageLatenessMinutes)}
+                    <div className={cn(
+                      "rounded-lg p-4 text-center",
+                      data.averageLatenessMinutes === 0
+                        ? "bg-green-50 dark:bg-green-900/20"
+                        : "bg-yellow-50 dark:bg-yellow-900/20"
+                    )}>
+                      <p className={cn(
+                        "text-2xl font-bold",
+                        data.averageLatenessMinutes === 0
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-yellow-600 dark:text-yellow-400"
+                      )}>
+                        {data.averageLatenessMinutes === 0 ? 'On time' : formatLateness(data.averageLatenessMinutes)}
                       </p>
-                      <p className="text-xs text-yellow-600/70 dark:text-yellow-400/70 mt-1">
+                      <p className={cn(
+                        "text-xs mt-1",
+                        data.averageLatenessMinutes === 0
+                          ? "text-green-600/70 dark:text-green-400/70"
+                          : "text-yellow-600/70 dark:text-yellow-400/70"
+                      )}>
                         Avg. Lateness
                       </p>
                     </div>
@@ -241,8 +279,8 @@ export function StudentDetailsModal({
                                     entry.lateness_minutes <= 15
                                       ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                                       : entry.lateness_minutes <= 30
-                                      ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
-                                      : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                                        ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
+                                        : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                                   )}
                                 >
                                   +{formatLateness(entry.lateness_minutes)}

@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { AuthUser, UserRole } from '@/types/database.types';
+import type { AuthUser, UserRole, UserDetails } from '@/types/database.types';
 import type { Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -15,6 +15,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   userRole: UserRole | null;
+  userDetails: UserDetails | null;
+  isAdmin: boolean;
   isFloorStaff: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -29,17 +31,41 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const userRole = user?.user_metadata?.user_role || null;
+  // Get role from user_details table
+  const userRole = userDetails?.role || null;
+  const isAdmin = userRole === 'admin';
   const isFloorStaff = userRole === 'floor_staff';
+
+  // Fetch user details from database
+  const fetchUserDetails = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_details')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching user details:', error);
+        return null;
+      }
+
+      return data as UserDetails;
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      return null;
+    }
+  };
 
   useEffect(() => {
     // Check for existing session
     const initializeAuth = async () => {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
-        
+
         if (currentSession?.user) {
           setSession(currentSession);
           setUser({
@@ -47,19 +73,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
             email: currentSession.user.email || '',
             user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
           });
+
+          // Fetch role from user_details table (don't block on error)
+          fetchUserDetails(currentSession.user.id).then(details => {
+            setUserDetails(details);
+          });
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
 
     initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      async (_event, currentSession) => {
         if (currentSession?.user) {
           setSession(currentSession);
           setUser({
@@ -67,11 +97,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
             email: currentSession.user.email || '',
             user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
           });
+
+          // Fetch role from user_details table
+          fetchUserDetails(currentSession.user.id).then(details => {
+            setUserDetails(details);
+          });
         } else {
           setSession(null);
           setUser(null);
+          setUserDetails(null);
         }
-        setLoading(false);
       }
     );
 
@@ -101,6 +136,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
+    setUserDetails(null);
   }, []);
 
   const value: AuthContextType = {
@@ -108,6 +144,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     session,
     loading,
     userRole,
+    userDetails,
+    isAdmin,
     isFloorStaff,
     signIn,
     signOut,

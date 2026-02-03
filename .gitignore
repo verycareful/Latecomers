@@ -33,3 +33,14 @@ dist-ssr
 # Build output
 dist/
 build/
+
+# Database SQL files (contains sensitive schema info)
+database/
+
+# Excel/CSV files
+*.xlsx
+*.xls
+*.csv
+
+# Supabase local config
+supabase/.temp/

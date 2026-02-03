@@ -13,7 +13,9 @@ interface FilterBarProps {
   onClearFilters: () => void;
 }
 
-const YEARS = [1, 2, 3, 4];
+// Generate batch years (last 6 years for joining year filter)
+const currentYear = new Date().getFullYear();
+const BATCHES = Array.from({ length: 6 }, (_, i) => currentYear - i);
 const SECTIONS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 const QUICK_FILTERS: { label: string; value: QuickFilterPreset }[] = [
@@ -35,7 +37,7 @@ export function FilterBar({
 
   const activeQuickFilter = useMemo(() => {
     if (!filters.date && !filters.dateRange.start) return null;
-    
+
     for (const qf of QUICK_FILTERS) {
       const range = getDateRangeForPreset(qf.value);
       if (filters.date) {
@@ -105,10 +107,10 @@ export function FilterBar({
     });
   };
 
-  const handleYearChange = (value: string) => {
+  const handleBatchChange = (value: string) => {
     onFiltersChange({
       ...filters,
-      year: value ? parseInt(value, 10) : null,
+      batch: value ? parseInt(value, 10) : null,
     });
   };
 
@@ -144,7 +146,7 @@ export function FilterBar({
     filters.date ||
     filters.dateRange.start ||
     filters.department ||
-    filters.year ||
+    filters.batch ||
     filters.section ||
     filters.searchQuery;
 
@@ -236,7 +238,7 @@ export function FilterBar({
               {showDateRange ? 'Single date' : 'Date range'}
             </button>
           </div>
-          
+
           {showDateRange ? (
             <div className="flex gap-2 items-center">
               <input
@@ -285,20 +287,20 @@ export function FilterBar({
           </select>
         </div>
 
-        {/* Year Filter */}
+        {/* Batch Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Year
+            Batch
           </label>
           <select
-            value={filters.year || ''}
-            onChange={(e) => handleYearChange(e.target.value)}
+            value={filters.batch || ''}
+            onChange={(e) => handleBatchChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">All Years</option>
-            {YEARS.map((year) => (
-              <option key={year} value={year}>
-                Year {year}
+            <option value="">All Batches</option>
+            {BATCHES.map((batch) => (
+              <option key={batch} value={batch}>
+                {batch}
               </option>
             ))}
           </select>

@@ -1,6 +1,5 @@
 import {
   format,
-  parse,
   isToday,
   isYesterday,
   startOfDay,
@@ -25,10 +24,10 @@ export const formatTime = (timeString: string): string => {
     const timeParts = timeString.split(':');
     const hours = parseInt(timeParts[0], 10);
     const minutes = timeParts[1];
-    
+
     const period = hours >= 12 ? 'PM' : 'AM';
     const displayHours = hours % 12 || 12;
-    
+
     return `${displayHours}:${minutes} ${period}`;
   } catch {
     return timeString;
@@ -57,15 +56,15 @@ export const formatDate = (dateString: string): string => {
 export const formatDateRelative = (dateString: string): string => {
   try {
     const date = parseISO(dateString);
-    
+
     if (isToday(date)) {
       return 'Today';
     }
-    
+
     if (isYesterday(date)) {
       return 'Yesterday';
     }
-    
+
     return format(date, 'MMM d, yyyy');
   } catch {
     return dateString;

@@ -100,7 +100,7 @@ export function StudentSearch({ onSelectStudent }: StudentSearchProps) {
                         {student.name}
                       </p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {student.register_number} • {student.department} • Year {student.year}
+                        {student.register_number} • {student.department} • Batch {student.batch}
                       </p>
                     </div>
                     <svg

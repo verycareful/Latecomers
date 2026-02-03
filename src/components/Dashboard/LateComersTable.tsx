@@ -47,7 +47,7 @@ export function LateComersTable({
                 Section
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Year
+                Batch
               </th>
               {showDate && (
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -109,7 +109,7 @@ export function LateComersTable({
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {record.year}
+                      {record.batch}
                     </span>
                   </td>
                   {showDate && (
@@ -134,8 +134,8 @@ export function LateComersTable({
                             latenessMinutes <= 15
                               ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                               : latenessMinutes <= 30
-                              ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
-                              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                                ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
+                                : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                           )}
                         >
                           +{formatLateness(latenessMinutes)}
@@ -150,8 +150,8 @@ export function LateComersTable({
                         record.previous_late_count === 0
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                           : record.previous_late_count <= 2
-                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                          : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                       )}
                     >
                       {record.previous_late_count}

@@ -22,10 +22,10 @@ const DEFAULT_ENTRY_TIME = '08:00:00'; // 8:00 AM
 export const calculateLatenessMinutes = (timeString: string): number => {
   const [hours, minutes] = timeString.split(':').map(Number);
   const [defaultHours, defaultMinutes] = DEFAULT_ENTRY_TIME.split(':').map(Number);
-  
+
   const entryMinutes = hours * 60 + minutes;
   const defaultMinutes_total = defaultHours * 60 + defaultMinutes;
-  
+
   return Math.max(0, entryMinutes - defaultMinutes_total);
 };
 
@@ -34,10 +34,10 @@ export const calculateLatenessMinutes = (timeString: string): number => {
  */
 export const formatLateness = (minutes: number): string => {
   if (minutes === 0) return 'On time';
-  
+
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  
+
   if (hours === 0) {
     return `${mins} min`;
   } else if (mins === 0) {
@@ -75,7 +75,7 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
 
   // If we got data from dashboard view, extract student info from it
   let student: Student;
-  
+
   if (dashboardData && dashboardData.length > 0) {
     const firstRecord = dashboardData[0] as LateComingDashboard;
     // Try to get full student info from students table
@@ -84,7 +84,7 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
       .select('*')
       .eq('register_number', registerNumber)
       .maybeSingle();
-    
+
     if (studentData) {
       student = studentData as Student;
     } else {
@@ -94,11 +94,10 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
         name: firstRecord.name,
         department: firstRecord.department,
         section: firstRecord.section,
-        year: firstRecord.year,
         course: 'N/A', // Not available in view
-        batch: 0,
+        batch: firstRecord.batch || 0,
         specialization: 'N/A',
-        semester: 0,
+        semester: firstRecord.semester || 0,
       };
     }
   } else {
@@ -123,7 +122,6 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
         batch: 0,
         department: 'N/A',
         specialization: 'N/A',
-        year: 0,
         semester: 0,
         section: 'N/A',
       };
@@ -169,8 +167,8 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
     (sum, entry) => sum + entry.lateness_minutes,
     0
   );
-  const averageLatenessMinutes = totalLateCount > 0 
-    ? Math.round(totalLatenessMinutes / totalLateCount) 
+  const averageLatenessMinutes = totalLateCount > 0
+    ? Math.round(totalLatenessMinutes / totalLateCount)
     : 0;
 
   return {
@@ -210,7 +208,7 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
   // Get all students from dashboard view (to get unique students)
   const { data: dashboardData, error: dashboardError } = await supabase
     .from('late_comers_dashboard')
-    .select('register_number, name, department, section, year, time');
+    .select('register_number, name, department, section, batch, semester, time');
 
   if (dashboardError) {
     console.error('Dashboard query error:', dashboardError);
@@ -231,12 +229,13 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
     name: string;
     department: string;
     section: string;
-    year: number;
+    batch: number;
+    semester: number;
     time: string;
   };
 
   const lateRecordsByStudent: Record<string, { times: string[]; info: DashboardEntry }> = {};
-  
+
   ((dashboardData || []) as DashboardEntry[]).forEach((entry) => {
     if (!lateRecordsByStudent[entry.register_number]) {
       lateRecordsByStudent[entry.register_number] = {
@@ -255,7 +254,7 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
     const lateData = lateRecordsByStudent[student.register_number];
     const times = lateData?.times || [];
     const totalLateness = times.reduce((sum, time) => sum + calculateLatenessMinutes(time), 0);
-    
+
     studentsMap[student.register_number] = {
       ...student,
       total_late_days: times.length,
@@ -269,17 +268,16 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
     if (!studentsMap[regNo]) {
       const times = data.times;
       const totalLateness = times.reduce((sum, time) => sum + calculateLatenessMinutes(time), 0);
-      
+
       studentsMap[regNo] = {
         register_number: regNo,
         name: data.info.name,
         department: data.info.department,
         section: data.info.section,
-        year: data.info.year,
         course: 'N/A',
-        batch: 0,
+        batch: data.info.batch || 0,
         specialization: 'N/A',
-        semester: 0,
+        semester: data.info.semester || 0,
         total_late_days: times.length,
         total_lateness_minutes: totalLateness,
         average_lateness_minutes: times.length > 0 ? Math.round(totalLateness / times.length) : 0,

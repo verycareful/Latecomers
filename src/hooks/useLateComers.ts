@@ -6,6 +6,7 @@ import type {
   LateComingInsert,
   DashboardFilters,
   SortConfig,
+  Student,
 } from '@/types/database.types';
 import { formatDateToISO } from '@/utils/dateHelpers';
 
@@ -48,9 +49,9 @@ const fetchLateComers = async ({
     query = query.eq('department', filters.department);
   }
 
-  // Apply year filter
-  if (filters.year) {
-    query = query.eq('year', filters.year);
+  // Apply batch filter
+  if (filters.batch) {
+    query = query.eq('batch', filters.batch);
   }
 
   // Apply section filter
@@ -131,7 +132,7 @@ export function useAddLateComing() {
     mutationFn: async (record: LateComingInsert) => {
       const { data, error } = await supabase
         .from('late_comings')
-        .insert(record)
+        .insert(record as any)
         .select()
         .single();
 
@@ -164,7 +165,7 @@ export function useDepartments() {
         throw new Error(error.message);
       }
 
-      return data?.map((d) => d.department) || [];
+      return (data as { department: string }[] || []).map((d) => d.department);
     },
     staleTime: Infinity, // Departments rarely change
   });
@@ -176,7 +177,7 @@ export function useDepartments() {
 export function useSearchStudents(searchQuery: string) {
   return useQuery({
     queryKey: ['students', 'search', searchQuery],
-    queryFn: async () => {
+    queryFn: async (): Promise<Student[]> => {
       if (!searchQuery || searchQuery.length < 2) {
         return [];
       }
@@ -191,7 +192,7 @@ export function useSearchStudents(searchQuery: string) {
         throw new Error(error.message);
       }
 
-      return data || [];
+      return (data as Student[]) || [];
     },
     enabled: searchQuery.length >= 2,
     staleTime: 30000,

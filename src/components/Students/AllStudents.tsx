@@ -6,14 +6,14 @@ import { LoadingSpinner } from '@/components/Shared';
 import { cn } from '@/utils/helpers';
 import { StudentDetailsModal } from '@/components/Dashboard/StudentDetailsModal';
 
-type SortField = 'name' | 'department' | 'year' | 'total_late_days' | 'average_lateness';
+type SortField = 'name' | 'department' | 'batch' | 'total_late_days' | 'average_lateness';
 type SortDirection = 'asc' | 'desc';
 
 export function AllStudents() {
   const { data: students, isLoading, error } = useAllStudentsWithStats();
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
-  const [yearFilter, setYearFilter] = useState<number | null>(null);
+  const [batchFilter, setBatchFilter] = useState<number | null>(null);
   const [sortField, setSortField] = useState<SortField>('total_late_days');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [selectedStudentRegNo, setSelectedStudentRegNo] = useState<string | null>(null);
@@ -35,7 +35,7 @@ export function AllStudents() {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         if (!student.name.toLowerCase().includes(query) &&
-            !student.register_number.toLowerCase().includes(query)) {
+          !student.register_number.toLowerCase().includes(query)) {
           return false;
         }
       }
@@ -43,8 +43,8 @@ export function AllStudents() {
       if (departmentFilter && student.department !== departmentFilter) {
         return false;
       }
-      // Year filter
-      if (yearFilter && student.year !== yearFilter) {
+      // Batch filter
+      if (batchFilter && student.batch !== batchFilter) {
         return false;
       }
       return true;
@@ -60,8 +60,8 @@ export function AllStudents() {
         case 'department':
           comparison = a.department.localeCompare(b.department);
           break;
-        case 'year':
-          comparison = a.year - b.year;
+        case 'batch':
+          comparison = a.batch - b.batch;
           break;
         case 'total_late_days':
           comparison = a.total_late_days - b.total_late_days;
@@ -74,7 +74,7 @@ export function AllStudents() {
     });
 
     return filtered;
-  }, [students, searchQuery, departmentFilter, yearFilter, sortField, sortDirection]);
+  }, [students, searchQuery, departmentFilter, batchFilter, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -194,19 +194,19 @@ export function AllStudents() {
             </select>
           </div>
 
-          {/* Year */}
+          {/* Batch */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Year
+              Batch
             </label>
             <select
-              value={yearFilter || ''}
-              onChange={(e) => setYearFilter(e.target.value ? parseInt(e.target.value) : null)}
+              value={batchFilter || ''}
+              onChange={(e) => setBatchFilter(e.target.value ? parseInt(e.target.value) : null)}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
             >
-              <option value="">All Years</option>
-              {[1, 2, 3, 4].map(year => (
-                <option key={year} value={year}>Year {year}</option>
+              <option value="">All Batches</option>
+              {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i).map(batch => (
+                <option key={batch} value={batch}>{batch}</option>
               ))}
             </select>
           </div>
@@ -243,7 +243,7 @@ export function AllStudents() {
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th 
+                <th
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => handleSort('name')}
                 >
@@ -252,28 +252,28 @@ export function AllStudents() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Register No.
                 </th>
-                <th 
+                <th
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => handleSort('department')}
                 >
                   Department <SortIcon field="department" />
                 </th>
-                <th 
+                <th
                   className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                  onClick={() => handleSort('year')}
+                  onClick={() => handleSort('batch')}
                 >
-                  Year <SortIcon field="year" />
+                  Batch <SortIcon field="batch" />
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Section
                 </th>
-                <th 
+                <th
                   className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => handleSort('total_late_days')}
                 >
                   Late Days <SortIcon field="total_late_days" />
                 </th>
-                <th 
+                <th
                   className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => handleSort('average_lateness')}
                 >
@@ -308,7 +308,7 @@ export function AllStudents() {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {student.year}
+                      {student.batch}
                     </span>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-center">
@@ -323,10 +323,10 @@ export function AllStudents() {
                         student.total_late_days === 0
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
                           : student.total_late_days <= 3
-                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
-                          : student.total_late_days <= 7
-                          ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
-                          : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
+                            : student.total_late_days <= 7
+                              ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                       )}
                     >
                       {student.total_late_days}
@@ -340,8 +340,8 @@ export function AllStudents() {
                           student.average_lateness_minutes <= 15
                             ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
                             : student.average_lateness_minutes <= 30
-                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
-                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                              ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300'
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
                         )}
                       >
                         {formatLateness(student.average_lateness_minutes)}

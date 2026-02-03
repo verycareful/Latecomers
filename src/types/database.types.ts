@@ -50,7 +50,6 @@ export interface Database {
           batch: number;
           department: string;
           specialization: string;
-          year: number;
           semester: number;
           section: string;
         };
@@ -61,7 +60,6 @@ export interface Database {
           batch: number;
           department: string;
           specialization: string;
-          year: number;
           semester: number;
           section: string;
         };
@@ -72,7 +70,6 @@ export interface Database {
           batch?: number;
           department?: string;
           specialization?: string;
-          year?: number;
           semester?: number;
           section?: string;
         };
@@ -105,10 +102,12 @@ export interface Database {
           name: string;
           department: string;
           section: string;
-          year: number;
+          batch: number;
+          semester: number;
           date: string;
           time: string;
-          registered_by: string;
+          registered_by: string; // UUID
+          registered_by_name?: string;
           previous_late_count: number;
         };
       };
@@ -126,7 +125,7 @@ export type LateComingInsert = Database['public']['Tables']['late_comings']['Ins
 export type LateComingDashboard = Database['public']['Views']['late_comers_dashboard']['Row'];
 
 // User role types
-export type UserRole = 'staff' | 'floor_staff';
+export type UserRole = 'admin' | 'staff' | 'floor_staff';
 
 export interface UserMetadata {
   user_role: UserRole;
@@ -139,6 +138,17 @@ export interface AuthUser {
   user_metadata: UserMetadata;
 }
 
+// User details table type
+export interface UserDetails {
+  id: string;
+  name: string;
+  staff_id: string;
+  department: string;
+  role: UserRole;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Filter types for the dashboard
 export interface DashboardFilters {
   date: Date | null;
@@ -147,7 +157,7 @@ export interface DashboardFilters {
     end: Date | null;
   };
   department: string | null;
-  year: number | null;
+  batch: number | null;
   section: string | null;
   searchQuery: string;
 }

@@ -6,17 +6,17 @@ import { FilterBar } from './FilterBar';
 import { LateComersTable } from './LateComersTable';
 import { AddLateEntryModal } from './AddLateEntryModal';
 import { StudentDetailsModal } from './StudentDetailsModal';
-import { StudentSearch } from './StudentSearch';
+
 import { StatsCards } from './StatsCards';
 import { exportToCSV } from '@/utils/helpers';
 import { formatDateRelative } from '@/utils/dateHelpers';
-import type { DashboardFilters, SortConfig, Student } from '@/types/database.types';
+import type { DashboardFilters, SortConfig } from '@/types/database.types';
 
 const DEFAULT_FILTERS: DashboardFilters = {
   date: new Date(),
   dateRange: { start: null, end: null },
   department: null,
-  year: null,
+  batch: null,
   section: null,
   searchQuery: '',
 };
@@ -74,10 +74,7 @@ export function Dashboard() {
     setIsStudentDetailsOpen(true);
   }, []);
 
-  const handleStudentSelect = useCallback((student: Student) => {
-    setSelectedStudentRegNo(student.register_number);
-    setIsStudentDetailsOpen(true);
-  }, []);
+
 
   const handleCloseStudentDetails = useCallback(() => {
     setIsStudentDetailsOpen(false);
@@ -195,34 +192,6 @@ export function Dashboard() {
 
       {/* Stats Cards */}
       <StatsCards date={filters.date || new Date()} />
-
-      {/* Student Search */}
-      <div className="mb-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <svg
-              className="w-5 h-5 text-primary-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Look Up Student
-            </h3>
-          </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-            Search for any student to view their details and late arrival history
-          </p>
-          <StudentSearch onSelectStudent={handleStudentSelect} />
-        </div>
-      </div>
 
       {/* Filter Bar */}
       <FilterBar

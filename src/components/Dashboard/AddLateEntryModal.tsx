@@ -23,7 +23,7 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
-  
+
   const { user } = useAuth();
   const { data: searchResults = [], isLoading: searching } = useSearchStudents(searchQuery);
   const addLateComing = useAddLateComing();
@@ -42,8 +42,6 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
       time: getCurrentTime(),
     },
   });
-
-  const watchedRegisterNumber = watch('registerNumber');
 
   // Reset form when modal opens
   useEffect(() => {
@@ -80,7 +78,7 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
     setSearchQuery(''); // Clear search to hide dropdown
   };
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = (_data: FormData) => {
     if (!selectedStudent) {
       toast.error('Please select a student');
       return;
@@ -180,9 +178,9 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
                       </dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-gray-500 dark:text-gray-400">Year / Section:</dt>
+                      <dt className="text-gray-500 dark:text-gray-400">Batch / Section:</dt>
                       <dd className="font-medium text-gray-900 dark:text-white">
-                        Year {selectedStudent.year} - Section {selectedStudent.section}
+                        {selectedStudent.batch} - Section {selectedStudent.section}
                       </dd>
                     </div>
                     <div className="flex justify-between">
@@ -243,7 +241,7 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
                     autoComplete="off"
                   />
-                  
+
                   {/* Search Results Dropdown */}
                   {searchQuery.length >= 2 && (
                     <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-48 overflow-y-auto">
@@ -263,7 +261,7 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
                               {student.name}
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {student.register_number} • {student.department} • Year {student.year}
+                              {student.register_number} • {student.department} • Batch {student.batch}
                             </div>
                           </button>
                         ))
@@ -303,7 +301,7 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
                         {selectedStudent.name}
                       </div>
                       <div className="text-sm text-green-600 dark:text-green-400">
-                        {selectedStudent.department} • Year {selectedStudent.year} • Section {selectedStudent.section}
+                        {selectedStudent.department} • Batch {selectedStudent.batch} • Section {selectedStudent.section}
                       </div>
                     </div>
                   </div>
