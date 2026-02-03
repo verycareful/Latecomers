@@ -170,31 +170,67 @@ export interface StaffUserInput {
 
 /**
  * Hook to create a new staff user (admin only)
- * This uses the Supabase Admin API via Edge Function
+ * Creates auth user via signUp and then adds user_details
  */
 export function useCreateStaffUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (input: StaffUserInput) => {
-      // Get the current session to pass the token
-      const { data: { session } } = await supabase.auth.getSession();
-
-      if (!session?.access_token) {
+      // Store current session before creating new user
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      if (!currentSession) {
         throw new Error('Not authenticated');
       }
 
-      // Use the edge function to create user (since we can't use admin API from client)
-      const { data, error } = await supabase.functions.invoke('create-staff-user', {
-        body: input,
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
+      // Create the auth user using signUp
+      // Note: In Supabase settings, you may need to disable email confirmation for this to work smoothly
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: input.email,
+        password: input.password,
+        options: {
+          data: {
+            name: input.name,
+            user_role: input.role,
+          },
         },
       });
 
-      if (error) throw new Error(error.message);
-      if (data?.error) throw new Error(data.error);
-      return data;
+      if (signUpError) {
+        throw new Error(signUpError.message);
+      }
+
+      if (!signUpData.user) {
+        throw new Error('Failed to create user');
+      }
+
+      const newUserId = signUpData.user.id;
+
+      // Restore the admin's session immediately
+      await supabase.auth.setSession({
+        access_token: currentSession.access_token,
+        refresh_token: currentSession.refresh_token,
+      });
+
+      // Now insert the user_details record
+      const { error: detailsError } = await supabase
+        .from('user_details')
+        .insert({
+          id: newUserId,
+          name: input.name,
+          staff_id: input.staff_id,
+          department: input.department,
+          role: input.role,
+        });
+
+      if (detailsError) {
+        // User was created but details failed - log this
+        console.error('User created but details insert failed:', detailsError);
+        throw new Error(`User created but failed to save details: ${detailsError.message}`);
+      }
+
+      return { user: signUpData.user };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staffUsers'] });

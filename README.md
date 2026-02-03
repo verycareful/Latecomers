@@ -13,29 +13,36 @@ A modern web application for tracking and managing student late arrivals in educ
 - **Real-time late comers list** with pagination and sorting
 - **Quick filters** - Today, Yesterday, This Week, This Month
 - **Date range filtering** - Select custom from-to dates
-- **Advanced filters** - Department, Year, Section
+- **Advanced filters** - Department, Batch, Section
 - **Search** - Find students by name or register number
 - **Statistics cards** - Total late, departments affected, top department, average per department
 - **"How Late" column** - Shows lateness duration with color-coded badges
+- **Delete late entries** - Admins can delete late entry records
 
 ### Student Management
 - **All Students page** - View complete student directory
 - **Lateness statistics** - Total late days and average lateness per student
-- **Sortable columns** - Sort by name, department, year, late count, average lateness
+- **Sortable columns** - Sort by name, department, batch, late count, average lateness
 - **Student details modal** - Click any student to view detailed information
 
 ### Student Details
-- **Profile information** - Name, register number, department, year, section, batch
+- **Profile information** - Name, register number, course, department, specialization, batch, section
 - **Lateness statistics** - Total late days, total lateness time, average lateness
 - **Late history table** - Complete record of all late arrivals with timestamps
 - **Default entry time** - 8:00 AM baseline for lateness calculations
+
+### Admin Panel
+- **Staff Management** - View, add, edit, and delete staff users
+- **Staff Details Modal** - Click any staff to view detailed information with role permissions
+- **Student Management** - Manage student records
+- **Role-based access control** - Admin, Staff, and Floor Staff roles
 
 ### Additional Features
 - **Dark mode** - Pitch black theme for OLED displays
 - **Responsive design** - Works on desktop, tablet, and mobile
 - **Export to CSV** - Download late comers report
-- **Add late entry** - Record new late arrivals (floor staff)
-- **Role-based access** - Staff (view only) and Floor Staff (view + add entries)
+- **Add late entry** - Record new late arrivals (floor staff/admin)
+- **Role-based access** - Admin (full access), Staff (view only), Floor Staff (view + add entries)
 
 ## Tech Stack
 
@@ -102,48 +109,68 @@ Execute the following SQL in your Supabase SQL Editor:
 ```sql
 -- Departments table
 CREATE TABLE departments (
-    department VARCHAR(20) PRIMARY KEY
+    department VARCHAR(100) PRIMARY KEY
 );
+
+-- Enable RLS on departments
+ALTER TABLE departments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "authenticated_read_departments" ON departments
+FOR SELECT TO authenticated USING (true);
 
 -- Specializations table
 CREATE TABLE specializations (
-    department VARCHAR(20) REFERENCES departments(department),
-    specialization VARCHAR(20),
+    department VARCHAR(100) REFERENCES departments(department),
+    specialization VARCHAR(100),
     PRIMARY KEY (department, specialization)
 );
 
 -- Courses table
 CREATE TABLE courses (
-    course VARCHAR(10) PRIMARY KEY
+    course VARCHAR(50) PRIMARY KEY
 );
 
 -- Students table
 CREATE TABLE students (
     register_number VARCHAR(15) PRIMARY KEY,
-    name VARCHAR(30) NOT NULL,
-    course VARCHAR(10) NOT NULL REFERENCES courses(course),
-    batch INT NOT NULL,
-    department VARCHAR(20) NOT NULL,
-    specialization VARCHAR(20) NOT NULL,
-    year INT NOT NULL,
-    semester INT NOT NULL,
-    section CHAR(1) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    course VARCHAR(50) NOT NULL REFERENCES courses(course),
+    batch INT NOT NULL CHECK (batch >= 2000 AND batch <= 2100),
+    department VARCHAR(100) NOT NULL REFERENCES departments(department),
+    specialization VARCHAR(100) NOT NULL,
+    section VARCHAR(10) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     FOREIGN KEY (department, specialization) 
         REFERENCES specializations(department, specialization)
 );
 
--- Late comings table
-CREATE TABLE late_comings (
-    register_number VARCHAR(15) NOT NULL,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
-    registered_by VARCHAR(20) NOT NULL,
-    PRIMARY KEY (register_number, date),
-    FOREIGN KEY (register_number) REFERENCES students(register_number)
+-- User details table (for staff/admin)
+CREATE TABLE user_details (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    staff_id VARCHAR(50) NOT NULL UNIQUE,
+    department VARCHAR(100) NOT NULL REFERENCES departments(department),
+    role VARCHAR(50) NOT NULL CHECK (role IN ('admin', 'staff', 'floor_staff')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create index for performance
-CREATE INDEX idx_late_comings_date_time ON late_comings(date, time);
+-- Late comings table
+CREATE TABLE late_comings (
+    register_number VARCHAR(15) NOT NULL REFERENCES students(register_number) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    time TIME NOT NULL,
+    registered_by UUID NOT NULL REFERENCES auth.users(id),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    PRIMARY KEY (register_number, date)
+);
+
+-- Create indexes for performance
+CREATE INDEX idx_students_batch ON students(batch);
+CREATE INDEX idx_students_department ON students(department);
+CREATE INDEX idx_late_comings_date ON late_comings(date);
+CREATE INDEX idx_late_comings_registered_by ON late_comings(registered_by);
+CREATE INDEX idx_user_details_staff_id ON user_details(staff_id);
+CREATE INDEX idx_user_details_role ON user_details(role);
 ```
 
 ### Dashboard View
@@ -151,24 +178,29 @@ CREATE INDEX idx_late_comings_date_time ON late_comings(date, time);
 Create a view for the dashboard:
 
 ```sql
-CREATE VIEW late_comers_dashboard AS
+CREATE VIEW late_comers_dashboard
+WITH (security_invoker = true) AS
 SELECT 
-    lc.register_number,
+    s.register_number,
     s.name,
     s.department,
     s.section,
-    s.year,
+    s.batch,
     lc.date,
     lc.time,
     lc.registered_by,
-    (SELECT COUNT(*) FROM late_comings lc2 
+    ud.name as registered_by_name,
+    (SELECT COUNT(*)::integer FROM late_comings lc2 
      WHERE lc2.register_number = lc.register_number 
      AND lc2.date < lc.date) as previous_late_count
 FROM late_comings lc
-JOIN students s ON lc.register_number = s.register_number;
+JOIN students s ON lc.register_number = s.register_number
+LEFT JOIN user_details ud ON ud.id = lc.registered_by;
+
+GRANT SELECT ON late_comers_dashboard TO authenticated;
 ```
 
-### Row Level Security (Optional)
+### Row Level Security
 
 Enable RLS for secure access:
 
@@ -176,9 +208,26 @@ Enable RLS for secure access:
 -- Enable RLS
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE late_comings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_details ENABLE ROW LEVEL SECURITY;
 
--- Create policies as needed based on your authentication setup
+-- Students: anyone authenticated can view
+CREATE POLICY "view_students" ON students FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "admin_manage_students" ON students FOR ALL USING (true);
+
+-- Late comings: anyone authenticated can view, authenticated users can insert/delete
+CREATE POLICY "view_late_comings" ON late_comings FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "manage_late_comings" ON late_comings FOR ALL USING (true);
+
+-- User details: authenticated users can view all
+CREATE POLICY "view_all_user_details" ON user_details FOR SELECT USING (true);
+CREATE POLICY "manage_user_details" ON user_details FOR ALL USING (true);
 ```
+
+### Supabase Auth Settings
+
+For staff user creation to work from the frontend:
+1. Go to **Authentication → Providers → Email**
+2. **Disable** "Confirm email" to allow immediate user creation
 
 ## Scripts
 
@@ -194,6 +243,12 @@ ALTER TABLE late_comings ENABLE ROW LEVEL SECURITY;
 ```
 src/
 ├── components/
+│   ├── Admin/          # Admin panel components
+│   │   ├── AdminPanel.tsx
+│   │   ├── StaffManagement.tsx
+│   │   ├── StaffEditModal.tsx
+│   │   ├── StudentManagement.tsx
+│   │   └── StudentEditModal.tsx
 │   ├── Auth/           # Login and protected routes
 │   ├── Dashboard/      # Main dashboard components
 │   │   ├── Dashboard.tsx
@@ -208,6 +263,7 @@ src/
 │   └── Students/       # All students page
 ├── hooks/              # Custom React hooks
 │   ├── useAuth.tsx
+│   ├── useAdmin.ts
 │   ├── useLateComers.ts
 │   ├── useStudentDetails.ts
 │   └── useTheme.tsx

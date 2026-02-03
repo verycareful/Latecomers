@@ -50,7 +50,6 @@ export interface Database {
           batch: number;
           department: string;
           specialization: string;
-          semester: number;
           section: string;
         };
         Insert: {
@@ -60,7 +59,6 @@ export interface Database {
           batch: number;
           department: string;
           specialization: string;
-          semester: number;
           section: string;
         };
         Update: {
@@ -70,7 +68,6 @@ export interface Database {
           batch?: number;
           department?: string;
           specialization?: string;
-          semester?: number;
           section?: string;
         };
       };
@@ -103,7 +100,6 @@ export interface Database {
           department: string;
           section: string;
           batch: number;
-          semester: number;
           date: string;
           time: string;
           registered_by: string; // UUID

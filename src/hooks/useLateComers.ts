@@ -150,6 +150,35 @@ export function useAddLateComing() {
 }
 
 /**
+ * Hook to delete a late coming record (admin only)
+ */
+export function useDeleteLateComing() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ registerNumber, date }: { registerNumber: string; date: string }) => {
+      const { error } = await supabase
+        .from('late_comings')
+        .delete()
+        .eq('register_number', registerNumber)
+        .eq('date', date);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { registerNumber, date };
+    },
+    onSuccess: () => {
+      // Invalidate and refetch late comers data
+      queryClient.invalidateQueries({ queryKey: ['lateComers'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboardStats'] });
+      queryClient.invalidateQueries({ queryKey: ['studentDetails'] });
+    },
+  });
+}
+
+/**
  * Fetch all departments for filter dropdown
  */
 export function useDepartments() {
@@ -162,9 +191,11 @@ export function useDepartments() {
         .order('department');
 
       if (error) {
+        console.error('Error fetching departments:', error);
         throw new Error(error.message);
       }
 
+      console.log('Departments fetched:', data);
       return (data as { department: string }[] || []).map((d) => d.department);
     },
     staleTime: Infinity, // Departments rarely change

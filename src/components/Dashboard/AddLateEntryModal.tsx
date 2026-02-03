@@ -96,7 +96,7 @@ export function AddLateEntryModal({ isOpen, onClose }: AddLateEntryModalProps) {
         register_number: selectedStudent.register_number,
         date: formData.date,
         time: formData.time,
-        registered_by: user.email || 'Unknown',
+        registered_by: user.id,
       });
 
       toast.success(`Late entry recorded for ${selectedStudent.name}`);

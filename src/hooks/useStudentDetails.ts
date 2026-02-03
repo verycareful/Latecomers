@@ -97,7 +97,6 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
         course: 'N/A', // Not available in view
         batch: firstRecord.batch || 0,
         specialization: 'N/A',
-        semester: firstRecord.semester || 0,
       };
     }
   } else {
@@ -122,7 +121,6 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
         batch: 0,
         department: 'N/A',
         specialization: 'N/A',
-        semester: 0,
         section: 'N/A',
       };
     }
@@ -208,7 +206,7 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
   // Get all students from dashboard view (to get unique students)
   const { data: dashboardData, error: dashboardError } = await supabase
     .from('late_comers_dashboard')
-    .select('register_number, name, department, section, batch, semester, time');
+    .select('register_number, name, department, section, batch, time');
 
   if (dashboardError) {
     console.error('Dashboard query error:', dashboardError);
@@ -230,7 +228,6 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
     department: string;
     section: string;
     batch: number;
-    semester: number;
     time: string;
   };
 
@@ -277,7 +274,6 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
         course: 'N/A',
         batch: data.info.batch || 0,
         specialization: 'N/A',
-        semester: data.info.semester || 0,
         total_late_days: times.length,
         total_lateness_minutes: totalLateness,
         average_lateness_minutes: times.length > 0 ? Math.round(totalLateness / times.length) : 0,

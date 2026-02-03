@@ -1,8 +1,11 @@
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import type { LateComingDashboard, PaginationConfig } from '@/types/database.types';
 import { formatTime, formatDateRelative } from '@/utils/dateHelpers';
 import { cn } from '@/utils/helpers';
 import { TableSkeleton, NoLateComersToday } from '@/components/Shared';
 import { calculateLatenessMinutes, formatLateness } from '@/hooks/useStudentDetails';
+import { useDeleteLateComing } from '@/hooks/useLateComers';
 
 interface LateComersTableProps {
   data: LateComingDashboard[];
@@ -11,6 +14,7 @@ interface LateComersTableProps {
   onPageChange: (page: number) => void;
   onRowClick?: (registerNumber: string) => void;
   showDate?: boolean;
+  isAdmin?: boolean;
 }
 
 export function LateComersTable({
@@ -20,8 +24,27 @@ export function LateComersTable({
   onPageChange,
   onRowClick,
   showDate = false,
+  isAdmin = false,
 }: LateComersTableProps) {
+  const [deleteConfirm, setDeleteConfirm] = useState<{ registerNumber: string; date: string; name: string } | null>(null);
+  const deleteLateComing = useDeleteLateComing();
   const totalPages = Math.ceil(pagination.totalCount / pagination.pageSize);
+
+  const handleDelete = async () => {
+    if (!deleteConfirm) return;
+    
+    try {
+      await deleteLateComing.mutateAsync({
+        registerNumber: deleteConfirm.registerNumber,
+        date: deleteConfirm.date,
+      });
+      toast.success(`Deleted late entry for ${deleteConfirm.name}`);
+      setDeleteConfirm(null);
+    } catch (error) {
+      toast.error('Failed to delete late entry');
+      console.error('Delete error:', error);
+    }
+  };
 
   if (!isLoading && data.length === 0) {
     return <NoLateComersToday />;
@@ -63,6 +86,11 @@ export function LateComersTable({
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Previous Late Count
               </th>
+              {isAdmin && (
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Actions
+                </th>
+              )}
             </tr>
           </thead>
           {isLoading ? (
@@ -157,6 +185,26 @@ export function LateComersTable({
                       {record.previous_late_count}
                     </span>
                   </td>
+                  {isAdmin && (
+                    <td className="px-4 py-3 whitespace-nowrap text-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteConfirm({
+                            registerNumber: record.register_number,
+                            date: record.date,
+                            name: record.name,
+                          });
+                        }}
+                        className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title="Delete entry"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -225,6 +273,41 @@ export function LateComersTable({
             >
               Next
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div
+            className="fixed inset-0 bg-black/50 transition-opacity"
+            onClick={() => setDeleteConfirm(null)}
+          />
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="relative w-full max-w-sm bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Delete Late Entry?
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Are you sure you want to delete the late entry for <strong>{deleteConfirm.name}</strong> on {formatDateRelative(deleteConfirm.date)}?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteLateComing.isPending}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {deleteLateComing.isPending ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

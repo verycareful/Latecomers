@@ -29,7 +29,7 @@ const DEFAULT_SORT: SortConfig = {
 const PAGE_SIZE = 20;
 
 export function Dashboard() {
-  const { isFloorStaff } = useAuth();
+  const { isFloorStaff, isAdmin } = useAuth();
   const [filters, setFilters] = useState<DashboardFilters>(DEFAULT_FILTERS);
   const [sort, setSort] = useState<SortConfig>(DEFAULT_SORT);
   const [page, setPage] = useState(0);
@@ -219,6 +219,7 @@ export function Dashboard() {
         onPageChange={setPage}
         onRowClick={handleRowClick}
         showDate={showDateColumn}
+        isAdmin={isAdmin}
       />
 
       {/* Add Late Entry Modal */}
