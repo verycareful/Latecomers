@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import type { LateComingDashboard, PaginationConfig } from '@/types/database.types';
+import type { LateComingDashboard, PaginationConfig, SortConfig, SortField } from '@/types/database.types';
 import { formatTime, formatDateRelative } from '@/utils/dateHelpers';
 import { cn } from '@/utils/helpers';
 import { TableSkeleton, NoLateComersToday } from '@/components/Shared';
@@ -15,6 +15,8 @@ interface LateComersTableProps {
   onRowClick?: (registerNumber: string) => void;
   showDate?: boolean;
   isAdmin?: boolean;
+  sort?: SortConfig;
+  onSortChange?: (sort: SortConfig) => void;
 }
 
 export function LateComersTable({
@@ -25,10 +27,32 @@ export function LateComersTable({
   onRowClick,
   showDate = false,
   isAdmin = false,
+  sort,
+  onSortChange,
 }: LateComersTableProps) {
   const [deleteConfirm, setDeleteConfirm] = useState<{ registerNumber: string; date: string; name: string } | null>(null);
   const deleteLateComing = useDeleteLateComing();
   const totalPages = Math.ceil(pagination.totalCount / pagination.pageSize);
+
+  const handleSort = (field: SortField) => {
+    if (!onSortChange) return;
+    if (sort?.field === field) {
+      onSortChange({ field, direction: sort.direction === 'asc' ? 'desc' : 'asc' });
+    } else {
+      onSortChange({ field, direction: 'asc' });
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (!sort || sort.field !== field) {
+      return onSortChange ? <span className="text-gray-400 ml-1">↕</span> : null;
+    }
+    return (
+      <span className="text-primary-500 ml-1">
+        {sort.direction === 'asc' ? '↑' : '↓'}
+      </span>
+    );
+  };
 
   const handleDelete = async () => {
     if (!deleteConfirm) return;
@@ -57,34 +81,82 @@ export function LateComersTable({
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Name
+              <th
+                className={cn(
+                  "px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('name')}
+              >
+                Name <SortIcon field="name" />
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Register No.
+              <th
+                className={cn(
+                  "px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('register_number')}
+              >
+                Register No. <SortIcon field="register_number" />
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Department
+              <th
+                className={cn(
+                  "px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('department')}
+              >
+                Department <SortIcon field="department" />
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Section
+              <th
+                className={cn(
+                  "px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('section')}
+              >
+                Section <SortIcon field="section" />
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Batch
+              <th
+                className={cn(
+                  "px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('batch')}
+              >
+                Batch <SortIcon field="batch" />
               </th>
               {showDate && (
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Date
+                <th
+                  className={cn(
+                    "px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                    onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  )}
+                  onClick={() => handleSort('date')}
+                >
+                  Date <SortIcon field="date" />
                 </th>
               )}
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Entry Time
+              <th
+                className={cn(
+                  "px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('time')}
+              >
+                Entry Time <SortIcon field="time" />
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 How Late
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Previous Late Count
+              <th
+                className={cn(
+                  "px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider",
+                  onSortChange && "cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                )}
+                onClick={() => handleSort('previous_late_count')}
+              >
+                Previous Late Count <SortIcon field="previous_late_count" />
               </th>
               {isAdmin && (
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">

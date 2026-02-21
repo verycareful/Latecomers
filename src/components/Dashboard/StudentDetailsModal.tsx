@@ -289,7 +289,7 @@ export function StudentDetailsModal({
                                 </span>
                               </td>
                               <td className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
-                                {entry.registered_by}
+                                {entry.registered_by_name || entry.registered_by}
                               </td>
                             </tr>
                           ))}

@@ -4,6 +4,7 @@ import type { Student, LateComingRecord, LateComingDashboard } from '@/types/dat
 
 export interface StudentLateHistory extends LateComingRecord {
   lateness_minutes: number;
+  registered_by_name?: string;
 }
 
 export interface StudentDetails {
@@ -129,7 +130,7 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
   // Fetch late history from dashboard view (bypasses RLS)
   const { data: lateHistoryData, error: historyError } = await supabase
     .from('late_comers_dashboard')
-    .select('date, time, registered_by, register_number')
+    .select('date, time, registered_by, registered_by_name, register_number')
     .eq('register_number', registerNumber)
     .order('date', { ascending: false });
 
@@ -143,14 +144,16 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
     date: string;
     time: string;
     registered_by: string;
+    registered_by_name?: string;
   };
 
   // Convert to LateComingRecord format
-  const lateHistory: LateComingRecord[] = ((lateHistoryData || []) as DashboardHistoryEntry[]).map((entry) => ({
+  const lateHistory: (LateComingRecord & { registered_by_name?: string })[] = ((lateHistoryData || []) as DashboardHistoryEntry[]).map((entry) => ({
     register_number: entry.register_number,
     date: entry.date,
     time: entry.time,
     registered_by: entry.registered_by,
+    registered_by_name: entry.registered_by_name,
   }));
 
   // Calculate lateness for each entry

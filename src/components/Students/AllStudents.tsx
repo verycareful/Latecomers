@@ -6,7 +6,7 @@ import { LoadingSpinner } from '@/components/Shared';
 import { cn } from '@/utils/helpers';
 import { StudentDetailsModal } from '@/components/Dashboard/StudentDetailsModal';
 
-type SortField = 'name' | 'department' | 'batch' | 'total_late_days' | 'average_lateness';
+type SortField = 'name' | 'register_number' | 'department' | 'batch' | 'section' | 'total_late_days' | 'average_lateness';
 type SortDirection = 'asc' | 'desc';
 
 export function AllStudents() {
@@ -14,6 +14,7 @@ export function AllStudents() {
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState<string>('');
   const [batchFilter, setBatchFilter] = useState<number | null>(null);
+  const [sectionFilter, setSectionFilter] = useState<string>('');
   const [sortField, setSortField] = useState<SortField>('total_late_days');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [selectedStudentRegNo, setSelectedStudentRegNo] = useState<string | null>(null);
@@ -24,6 +25,12 @@ export function AllStudents() {
     if (!students) return [];
     const depts = [...new Set(students.map(s => s.department))];
     return depts.sort();
+  }, [students]);
+
+  // Get unique sections
+  const sections = useMemo(() => {
+    if (!students) return [];
+    return [...new Set(students.map(s => s.section))].sort();
   }, [students]);
 
   // Filter and sort students
@@ -47,6 +54,10 @@ export function AllStudents() {
       if (batchFilter && student.batch !== batchFilter) {
         return false;
       }
+      // Section filter
+      if (sectionFilter && student.section !== sectionFilter) {
+        return false;
+      }
       return true;
     });
 
@@ -57,11 +68,17 @@ export function AllStudents() {
         case 'name':
           comparison = a.name.localeCompare(b.name);
           break;
+        case 'register_number':
+          comparison = a.register_number.localeCompare(b.register_number);
+          break;
         case 'department':
           comparison = a.department.localeCompare(b.department);
           break;
         case 'batch':
           comparison = a.batch - b.batch;
+          break;
+        case 'section':
+          comparison = a.section.localeCompare(b.section);
           break;
         case 'total_late_days':
           comparison = a.total_late_days - b.total_late_days;
@@ -74,7 +91,7 @@ export function AllStudents() {
     });
 
     return filtered;
-  }, [students, searchQuery, departmentFilter, batchFilter, sortField, sortDirection]);
+  }, [students, searchQuery, departmentFilter, batchFilter, sectionFilter, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -147,7 +164,7 @@ export function AllStudents() {
 
       {/* Filters */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Search */}
           <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -210,6 +227,23 @@ export function AllStudents() {
               ))}
             </select>
           </div>
+
+          {/* Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Section
+            </label>
+            <select
+              value={sectionFilter}
+              onChange={(e) => setSectionFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+            >
+              <option value="">All Sections</option>
+              {sections.map(section => (
+                <option key={section} value={section}>Section {section}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -249,8 +283,11 @@ export function AllStudents() {
                 >
                   Name <SortIcon field="name" />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Register No.
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('register_number')}
+                >
+                  Register No. <SortIcon field="register_number" />
                 </th>
                 <th
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -264,8 +301,11 @@ export function AllStudents() {
                 >
                   Batch <SortIcon field="batch" />
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Section
+                <th
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('section')}
+                >
+                  Section <SortIcon field="section" />
                 </th>
                 <th
                   className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"

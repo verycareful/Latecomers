@@ -158,7 +158,7 @@ export interface DashboardFilters {
   searchQuery: string;
 }
 
-export type SortField = 'time' | 'name' | 'previous_late_count' | 'department';
+export type SortField = 'time' | 'name' | 'register_number' | 'department' | 'section' | 'batch' | 'date' | 'previous_late_count';
 export type SortDirection = 'asc' | 'desc';
 
 export interface SortConfig {

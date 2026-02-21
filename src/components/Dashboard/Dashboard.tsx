@@ -220,6 +220,8 @@ export function Dashboard() {
         onRowClick={handleRowClick}
         showDate={showDateColumn}
         isAdmin={isAdmin}
+        sort={sort}
+        onSortChange={handleSortChange}
       />
 
       {/* Add Late Entry Modal */}

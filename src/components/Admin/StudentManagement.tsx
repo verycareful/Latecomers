@@ -12,20 +12,34 @@ export function StudentManagement() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
+  const [batchFilter, setBatchFilter] = useState<number | null>(null);
+  const [sectionFilter, setSectionFilter] = useState('');
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<'name' | 'register_number' | 'department' | 'batch' | 'section'>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const departments = useMemo(() => {
     if (!students) return [];
     return [...new Set(students.map(s => s.department))].sort();
   }, [students]);
 
+  const batches = useMemo(() => {
+    if (!students) return [];
+    return [...new Set(students.map(s => s.batch))].sort((a, b) => b - a);
+  }, [students]);
+
+  const sections = useMemo(() => {
+    if (!students) return [];
+    return [...new Set(students.map(s => s.section))].sort();
+  }, [students]);
+
   const filteredStudents = useMemo(() => {
     if (!students) return [];
     
-    return students.filter(student => {
+    let filtered = students.filter(student => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         if (!student.name.toLowerCase().includes(query) &&
@@ -36,9 +50,59 @@ export function StudentManagement() {
       if (departmentFilter && student.department !== departmentFilter) {
         return false;
       }
+      if (batchFilter && student.batch !== batchFilter) {
+        return false;
+      }
+      if (sectionFilter && student.section !== sectionFilter) {
+        return false;
+      }
       return true;
     });
-  }, [students, searchQuery, departmentFilter]);
+
+    filtered.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'register_number':
+          comparison = a.register_number.localeCompare(b.register_number);
+          break;
+        case 'department':
+          comparison = a.department.localeCompare(b.department);
+          break;
+        case 'batch':
+          comparison = a.batch - b.batch;
+          break;
+        case 'section':
+          comparison = a.section.localeCompare(b.section);
+          break;
+      }
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+
+    return filtered;
+  }, [students, searchQuery, departmentFilter, batchFilter, sectionFilter, sortField, sortDirection]);
+
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const SortIcon = ({ field }: { field: typeof sortField }) => {
+    if (sortField !== field) {
+      return <span className="text-gray-400 ml-1">↕</span>;
+    }
+    return (
+      <span className="text-primary-500 ml-1">
+        {sortDirection === 'asc' ? '↑' : '↓'}
+      </span>
+    );
+  };
 
   const handleEdit = (student: Student) => {
     setEditingStudent(student);
@@ -109,6 +173,30 @@ export function StudentManagement() {
               <option key={dept} value={dept}>{dept}</option>
             ))}
           </select>
+
+          {/* Batch Filter */}
+          <select
+            value={batchFilter || ''}
+            onChange={(e) => setBatchFilter(e.target.value ? parseInt(e.target.value) : null)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">All Batches</option>
+            {batches.map(batch => (
+              <option key={batch} value={batch}>{batch}</option>
+            ))}
+          </select>
+
+          {/* Section Filter */}
+          <select
+            value={sectionFilter}
+            onChange={(e) => setSectionFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">All Sections</option>
+            {sections.map(section => (
+              <option key={section} value={section}>Section {section}</option>
+            ))}
+          </select>
         </div>
 
         {/* Upload Button */}
@@ -151,20 +239,35 @@ export function StudentManagement() {
           <table className="w-full">
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Student
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('name')}
+                >
+                  Student <SortIcon field="name" />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Register No.
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('register_number')}
+                >
+                  Register No. <SortIcon field="register_number" />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Department
+                <th
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('department')}
+                >
+                  Department <SortIcon field="department" />
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Batch
+                <th
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('batch')}
+                >
+                  Batch <SortIcon field="batch" />
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                  Section
+                <th
+                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                  onClick={() => handleSort('section')}
+                >
+                  Section <SortIcon field="section" />
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions

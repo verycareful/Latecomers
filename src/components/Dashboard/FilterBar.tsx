@@ -338,8 +338,12 @@ export function FilterBar({
             >
               <option value="time">Time</option>
               <option value="name">Name</option>
-              <option value="previous_late_count">Late Count</option>
+              <option value="register_number">Register No.</option>
               <option value="department">Department</option>
+              <option value="section">Section</option>
+              <option value="batch">Batch</option>
+              <option value="date">Date</option>
+              <option value="previous_late_count">Late Count</option>
             </select>
             <button
               onClick={handleSortDirectionToggle}
