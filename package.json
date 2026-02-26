@@ -1,7 +1,7 @@
 {
   "name": "steam-portal",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.a.0",
   "description": "StEAM - Student Time and Attendance Management Portal: A modern web application for tracking and managing student attendance in educational institutions",
   "type": "module",
   "repository": {

@@ -11,6 +11,7 @@ interface StudentUploadModalProps {
 
 export function StudentUploadModal({ isOpen, onClose }: StudentUploadModalProps) {
   const [students, setStudents] = useState<StudentInput[]>([]);
+  const showCardColumn = students.some(s => s.card_id != null && s.card_id !== '');
   const [parseError, setParseError] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   
@@ -163,7 +164,7 @@ export function StudentUploadModal({ isOpen, onClose }: StudentUploadModalProps)
                 Required Columns
               </h3>
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                register_number, name, course, batch, department, specialization, section
+                register_number, name, course, batch, department, specialization, section (optional card_id)
               </p>
             </div>
 
@@ -197,6 +198,9 @@ export function StudentUploadModal({ isOpen, onClose }: StudentUploadModalProps)
                         <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Dept</th>
                         <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">Batch</th>
                         <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">Sec</th>
+                        {showCardColumn && (
+                          <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Card ID</th>
+                        )}
                         <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400"></th>
                       </tr>
                     </thead>
@@ -210,6 +214,11 @@ export function StudentUploadModal({ isOpen, onClose }: StudentUploadModalProps)
                           <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{student.department}</td>
                           <td className="px-3 py-2 text-center text-gray-600 dark:text-gray-400">{student.batch}</td>
                           <td className="px-3 py-2 text-center text-gray-600 dark:text-gray-400">{student.section}</td>
+                          {showCardColumn && (
+                            <td className="px-3 py-2 text-gray-600 dark:text-gray-400 text-xs">
+                              {student.card_id || ''}
+                            </td>
+                          )}
                           <td className="px-3 py-2 text-center">
                             <button
                               onClick={() => removeStudent(index)}
