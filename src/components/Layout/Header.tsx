@@ -118,10 +118,10 @@ export function Header() {
               </div>
               <div>
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Late Comers Tracker
+                  StEAM Portal
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-                  Student Attendance Monitoring System
+                  Student Time and Attendance Management
                 </p>
               </div>
             </Link>

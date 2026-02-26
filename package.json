@@ -1,8 +1,8 @@
 {
-  "name": "late-comers-tracker",
+  "name": "steam-portal",
   "private": true,
   "version": "1.0.0",
-  "description": "A modern web application for tracking and managing student late arrivals in educational institutions",
+  "description": "StEAM - Student Time and Attendance Management Portal: A modern web application for tracking and managing student attendance in educational institutions",
   "type": "module",
   "repository": {
     "type": "git",

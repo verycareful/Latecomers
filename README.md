@@ -1,6 +1,6 @@
-# Late Comers Tracker
+# StEAM - Student Time and Attendance Management Portal
 
-A modern web application for tracking and managing student late arrivals in educational institutions. Built with React, TypeScript, and Supabase.
+A modern web application for tracking and managing student time and attendance in educational institutions. Built with React, TypeScript, and Supabase.
 
 ![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)
