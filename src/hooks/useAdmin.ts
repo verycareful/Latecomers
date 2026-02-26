@@ -222,7 +222,7 @@ export function useCreateStaffUser() {
           staff_id: input.staff_id,
           department: input.department,
           role: input.role,
-        });
+        } as any);
 
       if (detailsError) {
         // User was created but details failed - log this

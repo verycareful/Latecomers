@@ -3,6 +3,9 @@
  * These types mirror the PostgreSQL schema in Supabase
  */
 
+// User role types (defined first for use in Database interface)
+export type UserRole = 'admin' | 'staff' | 'floor_staff';
+
 export interface Database {
   public: {
     Tables: {
@@ -91,6 +94,35 @@ export interface Database {
           registered_by?: string;
         };
       };
+      user_details: {
+        Row: {
+          id: string;
+          name: string;
+          staff_id: string;
+          department: string;
+          role: UserRole;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          staff_id: string;
+          department: string;
+          role: UserRole;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          staff_id?: string;
+          department?: string;
+          role?: UserRole;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Views: {
       late_comers_dashboard: {
@@ -118,10 +150,9 @@ export type Course = Database['public']['Tables']['courses']['Row'];
 export type Student = Database['public']['Tables']['students']['Row'];
 export type LateComingRecord = Database['public']['Tables']['late_comings']['Row'];
 export type LateComingInsert = Database['public']['Tables']['late_comings']['Insert'];
+export type UserDetailsRow = Database['public']['Tables']['user_details']['Row'];
+export type UserDetailsInsert = Database['public']['Tables']['user_details']['Insert'];
 export type LateComingDashboard = Database['public']['Views']['late_comers_dashboard']['Row'];
-
-// User role types
-export type UserRole = 'admin' | 'staff' | 'floor_staff';
 
 export interface UserMetadata {
   user_role: UserRole;
