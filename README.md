@@ -1,6 +1,6 @@
 # StEAM - Student Time and Attendance Management Portal
 
-**Version:** alpha 1.a.1
+**Version:** alpha 1.a.2
 
 
 A modern web application for tracking and managing student time and attendance in educational institutions. Built with React, TypeScript, and Supabase.
@@ -24,10 +24,10 @@ A modern web application for tracking and managing student time and attendance i
 
 ### Student Management
 - **All Students page** - View complete student directory
-- **Card ID registration status** - Admins can see if a student’s ID card has been registered and clear it if needed
 - **Lateness statistics** - Total late days and average lateness per student
-- **Sortable columns** - Sort by name, department, batch, late count, average lateness
+- **Sortable columns** - Sort by name, register number, department, batch, section
 - **Student details modal** - Click any student to view detailed information
+- **Default sort** - List sorted by register number
 
 ### Student Details
 - **Profile information** - Name, register number, course, department, specialization, batch, section

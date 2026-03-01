@@ -18,7 +18,7 @@ export function StudentManagement() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<'name' | 'register_number' | 'department' | 'batch' | 'section' | 'card'>('register_number');
+  const [sortField, setSortField] = useState<'name' | 'register_number' | 'department' | 'batch' | 'section'>('register_number');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const departments = useMemo(() => {
@@ -76,12 +76,6 @@ export function StudentManagement() {
           break;
         case 'section':
           comparison = a.section.localeCompare(b.section);
-          break;
-        case 'card':
-          // sort by presence of card_id then lexicographically
-          const aVal = a.card_id ? '1' : '0';
-          const bVal = b.card_id ? '1' : '0';
-          comparison = aVal.localeCompare(bVal); // '1' > '0'
           break;
       }
       return sortDirection === 'asc' ? comparison : -comparison;
@@ -275,12 +269,6 @@ export function StudentManagement() {
                 >
                   Section <SortIcon field="section" />
                 </th>
-                <th
-                  className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                  onClick={() => handleSort('card')}
-                >
-                  Card <SortIcon field="card" />
-                </th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
@@ -314,9 +302,6 @@ export function StudentManagement() {
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-600 dark:text-gray-400">
                     {student.section}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-center text-sm text-gray-600 dark:text-gray-400">
-                    {student.card_id ? 'Card Registered' : ''}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-center">
                     <div className="flex items-center justify-center gap-2">

@@ -98,7 +98,6 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
         course: 'N/A', // Not available in view
         batch: firstRecord.batch || 0,
         specialization: 'N/A',
-        card_id: null,
       };
     }
   } else {
@@ -124,7 +123,6 @@ const fetchStudentDetails = async (registerNumber: string): Promise<StudentDetai
         department: 'N/A',
         specialization: 'N/A',
         section: 'N/A',
-        card_id: null,
       };
     }
   }
@@ -199,7 +197,6 @@ export function useStudentDetails(registerNumber: string | null) {
  * Student with lateness statistics
  */
 export interface StudentWithStats extends Student {
-  // card_id is inherited from Student (string | null)
   total_late_days: number;
   total_lateness_minutes: number;
   average_lateness_minutes: number;
@@ -280,7 +277,6 @@ const fetchAllStudentsWithStats = async (): Promise<StudentWithStats[]> => {
         course: 'N/A',
         batch: data.info.batch || 0,
         specialization: 'N/A',
-        card_id: null,
         total_late_days: times.length,
         total_lateness_minutes: totalLateness,
         average_lateness_minutes: times.length > 0 ? Math.round(totalLateness / times.length) : 0,

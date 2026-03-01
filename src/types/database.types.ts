@@ -54,7 +54,6 @@ export interface Database {
           department: string;
           specialization: string;
           section: string;
-          card_id: string | null;
         };
         Insert: {
           register_number: string;
@@ -64,7 +63,6 @@ export interface Database {
           department: string;
           specialization: string;
           section: string;
-          card_id?: string | null;
         };
         Update: {
           register_number?: string;
@@ -74,7 +72,6 @@ export interface Database {
           department?: string;
           specialization?: string;
           section?: string;
-          card_id?: string | null;
         };
       };
       late_comings: {

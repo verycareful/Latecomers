@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useUpdateStudent, type StudentInput } from '@/hooks/useAdmin';
 import { LoadingSpinner } from '@/components/Shared';
-import { useAuth } from '@/hooks/useAuth';
 import type { Student } from '@/types/database.types';
 
 interface StudentEditModalProps {
@@ -12,14 +11,12 @@ interface StudentEditModalProps {
 
 export function StudentEditModal({ student, isOpen, onClose }: StudentEditModalProps) {
   const updateStudent = useUpdateStudent();
-  const { isAdmin } = useAuth();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
   } = useForm<StudentInput>({
     defaultValues: student || undefined,
   });
@@ -31,11 +28,6 @@ export function StudentEditModal({ student, isOpen, onClose }: StudentEditModalP
 
   const onSubmit = async (data: StudentInput) => {
     if (!student) return;
-
-    // ensure empty strings are converted to null
-    if (data.card_id === '') {
-      data.card_id = null;
-    }
 
     try {
       await updateStudent.mutateAsync({
@@ -172,31 +164,6 @@ export function StudentEditModal({ student, isOpen, onClose }: StudentEditModalP
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white uppercase"
                   />
                 </div>
-              </div>
-
-              {/* Card status (read-only) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Card Status
-                </label>
-                <div className="flex items-center gap-2">
-                  {student.card_id ? (
-                    <span className="text-green-600 dark:text-green-400">Card Registered</span>
-                  ) : (
-                    <span className="text-gray-500 dark:text-gray-400">Not Registered</span>
-                  )}
-                  {isAdmin && student.card_id && (
-                    <button
-                      type="button"
-                      onClick={() => setValue('card_id', null)}
-                      className="text-sm text-red-600 dark:text-red-400 hover:underline"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
-                {/* hidden input so value is submitted when clearing */}
-                <input type="hidden" {...register('card_id')} />
               </div>
             </div>
 

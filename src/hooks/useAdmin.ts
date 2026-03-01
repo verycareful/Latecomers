@@ -15,7 +15,6 @@ export interface StudentInput {
   department: string;
   specialization: string;
   section: string;
-  card_id?: string | null; // optional unique id from student ID card
 }
 
 /**
@@ -369,9 +368,6 @@ export function parseCSVToStudents(csvContent: string): StudentInput[] {
         specialization: record.specialization,
         section: record.section,
       };
-      if (headers.includes('card_id')) {
-        student.card_id = record.card_id || null;
-      }
       students.push(student);
     } catch (e) {
       errors.push(`Row ${i + 1}: Invalid data format`);
@@ -443,42 +439,29 @@ export async function parseExcelToStudents(file: File): Promise<StudentInput[]> 
             return undefined;
           };
 
-          students = jsonData.map((row) => {
-            const student: StudentInput = {
-              register_number: String(getValue(row, 'register_number', 'Register Number', 'RegisterNumber', 'Reg No', 'RegNo') || ''),
-              name: String(getValue(row, 'name', 'Name', 'Student Name', 'StudentName') || ''),
-              course: normalizeCourse(String(getValue(row, 'course', 'Course', 'Program') || 'B.Tech')),
-              batch: Number(getValue(row, 'batch', 'Batch', 'Year', 'Joining Year', 'JoiningYear') || new Date().getFullYear()),
-              department: String(getValue(row, 'department', 'Department', 'Dept', 'Branch') || ''),
-              specialization: String(getValue(row, 'specialization', 'Specialization', 'Spec', 'Major') || ''),
-              section: String(getValue(row, 'section', 'Section', 'Sec') || 'A'),
-            };
-            const cardVal = getValue(row, 'card_id', 'Card ID', 'CardId');
-            if (cardVal !== undefined) {
-              student.card_id = String(cardVal) || null;
-            }
-            return student;
-          });
+          students = jsonData.map((row) => ({
+            register_number: String(getValue(row, 'register_number', 'Register Number', 'RegisterNumber', 'Reg No', 'RegNo') || ''),
+            name: String(getValue(row, 'name', 'Name', 'Student Name', 'StudentName') || ''),
+            course: normalizeCourse(String(getValue(row, 'course', 'Course', 'Program') || 'B.Tech')),
+            batch: Number(getValue(row, 'batch', 'Batch', 'Year', 'Joining Year', 'JoiningYear') || new Date().getFullYear()),
+            department: String(getValue(row, 'department', 'Department', 'Dept', 'Branch') || ''),
+            specialization: String(getValue(row, 'specialization', 'Specialization', 'Spec', 'Major') || ''),
+            section: String(getValue(row, 'section', 'Section', 'Sec') || 'A'),
+          }));
         } else {
           // Parse WITHOUT headers - use column positions
           // Expected order: Register Number, Name, Course, Batch, Department, Specialization, Section
           students = rawData
             .filter(row => row.length >= 4 && row[0]) // Filter out empty rows
-            .map((row) => {
-              const student: StudentInput = {
-                register_number: String(row[0] || '').trim(),
-                name: String(row[1] || '').trim(),
-                course: normalizeCourse(String(row[2] || 'B.Tech')),
-                batch: Number(row[3]) || new Date().getFullYear(),
-                department: String(row[4] || '').trim(),
-                specialization: String(row[5] || '').trim(),
-                section: String(row[6] || 'A').trim(),
-              };
-              if (row.length >= 8) {
-                student.card_id = String(row[7] || '') || null;
-              }
-              return student;
-            });
+            .map((row) => ({
+              register_number: String(row[0] || '').trim(),
+              name: String(row[1] || '').trim(),
+              course: normalizeCourse(String(row[2] || 'B.Tech')),
+              batch: Number(row[3]) || new Date().getFullYear(),
+              department: String(row[4] || '').trim(),
+              specialization: String(row[5] || '').trim(),
+              section: String(row[6] || 'A').trim(),
+            }));
         }
 
         console.log('Parsed students:', students.length);
