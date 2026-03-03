@@ -113,7 +113,7 @@ export function useDeleteStudent() {
         .eq('register_number', registerNumber);
 
       if (lateComingsError) {
-        console.warn('Error deleting late comings:', lateComingsError);
+        throw new Error(`Failed to delete late records: ${lateComingsError.message}`);
       }
 
       // Then delete the student
@@ -177,60 +177,27 @@ export function useCreateStaffUser() {
 
   return useMutation({
     mutationFn: async (input: StaffUserInput) => {
-      // Store current session before creating new user
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      
-      if (!currentSession) {
-        throw new Error('Not authenticated');
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      // Create the auth user using signUp
-      // Note: In Supabase settings, you may need to disable email confirmation for this to work smoothly
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: input.email,
-        password: input.password,
-        options: {
-          data: {
-            name: input.name,
-            user_role: input.role,
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-staff-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
           },
-        },
-      });
+          body: JSON.stringify(input),
+        }
+      );
 
-      if (signUpError) {
-        throw new Error(signUpError.message);
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to create staff user');
       }
 
-      if (!signUpData.user) {
-        throw new Error('Failed to create user');
-      }
-
-      const newUserId = signUpData.user.id;
-
-      // Restore the admin's session immediately
-      await supabase.auth.setSession({
-        access_token: currentSession.access_token,
-        refresh_token: currentSession.refresh_token,
-      });
-
-      // Now insert the user_details record
-      const { error: detailsError } = await supabase
-        .from('user_details')
-        .insert({
-          id: newUserId,
-          name: input.name,
-          staff_id: input.staff_id,
-          department: input.department,
-          role: input.role,
-        } as any);
-
-      if (detailsError) {
-        // User was created but details failed - log this
-        console.error('User created but details insert failed:', detailsError);
-        throw new Error(`User created but failed to save details: ${detailsError.message}`);
-      }
-
-      return { user: signUpData.user };
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['staffUsers'] });
@@ -296,16 +263,25 @@ export function useDeleteStaffUser() {
 
   return useMutation({
     mutationFn: async (userId: string) => {
-      // Delete from user_details first
-      const { error: detailsError } = await supabase
-        .from('user_details')
-        .delete()
-        .eq('id', userId);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      if (detailsError) throw new Error(detailsError.message);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-staff-user`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ userId }),
+        }
+      );
 
-      // Note: Actually deleting auth user requires admin API
-      // For now, we just remove from user_details
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to delete user');
+      }
 
       return userId;
     },

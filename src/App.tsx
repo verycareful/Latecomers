@@ -42,7 +42,14 @@ function App() {
                 >
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/students" element={<AllStudents />} />
-                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedRoute requiredRole="admin">
+                        <AdminPanel />
+                      </ProtectedRoute>
+                    }
+                  />
                 </Route>
 
                 {/* Catch-all redirect */}

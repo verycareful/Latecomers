@@ -39,8 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const isAdmin = userRole === 'admin';
   const isFloorStaff = userRole === 'floor_staff';
 
-  // Fetch user details from database
-  const fetchUserDetails = async (userId: string) => {
+  const fetchUserDetails = async (userId: string): Promise<UserDetails | null> => {
     try {
       const { data, error } = await supabase
         .from('user_details')
@@ -52,7 +51,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         console.error('Error fetching user details:', error);
         return null;
       }
-
       return data as UserDetails;
     } catch (error) {
       console.error('Error fetching user details:', error);
@@ -61,56 +59,51 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-    // Check for existing session
-    const initializeAuth = async () => {
-      try {
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+    let isMounted = true;
 
-        if (currentSession?.user) {
-          setSession(currentSession);
-          setUser({
-            id: currentSession.user.id,
-            email: currentSession.user.email || '',
-            user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
-          });
+    // Safety timeout to ensure loading state clears even if Supabase initialization is delayed or fails silently.
+    const timeoutId = setTimeout(() => {
+      if (isMounted && loading) setLoading(false);
+    }, 5000);
 
-          // Fetch role from user_details table (don't block on error)
-          fetchUserDetails(currentSession.user.id).then(details => {
-            setUserDetails(details);
-          });
-        }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      if (!isMounted) return;
+
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setUser(null);
+        setUserDetails(null);
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-    };
 
-    initializeAuth();
+      if (currentSession?.user) {
+        setSession(currentSession);
+        setUser({
+          id: currentSession.user.id,
+          email: currentSession.user.email || '',
+          user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
+        });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, currentSession) => {
-        if (currentSession?.user) {
-          setSession(currentSession);
-          setUser({
-            id: currentSession.user.id,
-            email: currentSession.user.email || '',
-            user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
-          });
-
-          // Fetch role from user_details table
-          fetchUserDetails(currentSession.user.id).then(details => {
-            setUserDetails(details);
-          });
-        } else {
-          setSession(null);
-          setUser(null);
-          setUserDetails(null);
+        // Await user details, then clear loading
+        const details = await fetchUserDetails(currentSession.user.id);
+        if (isMounted) {
+          setUserDetails(details);
+          setLoading(false);
         }
+      } else {
+        setSession(null);
+        setUser(null);
+        setUserDetails(null);
+        setLoading(false);
       }
-    );
+    });
 
     return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, []);
@@ -133,10 +126,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setUserDetails(null);
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    } finally {
+      // Ensures UI state clears even if the server request fails 
+      // (e.g. if the refresh token is already revoked or network is down)
+      setUser(null);
+      setSession(null);
+      setUserDetails(null);
+    }
   }, []);
 
   const value: AuthContextType = {

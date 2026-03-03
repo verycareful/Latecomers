@@ -4,6 +4,34 @@ All notable changes to StEAM will be documented here.
 
 ---
 
+## [alpha 1.b.0] - 2026-03-03
+
+### Major Security & Stability Fixes (Audit Report Implementation)
+
+#### Security Fixes
+- **Fixed Staff Creation Security Vulnerability:** Staff users are no longer created via insecure client-side `signUp()`. Now uses Edge Function with service role key to prevent session hijacking attacks.
+- **Fixed Staff Deletion Vulnerability:** Deleted staff users are now completely removed from both `user_details` and `auth.users` tables (previously only removed from `user_details`, leaving ghost login credentials active).
+- **Added Admin Route Protection:** `/admin` route now requires `admin` role; non-admin authenticated users are redirected to dashboard.
+
+#### Authentication & UI Fixes
+- **Fixed Authentication Hang:** Added 5-second fallback timer to prevent indefinite "Checking authentication..." spinner if Supabase is slow or cold-starting.
+- **Fixed Role Flicker on Load:** User role is now properly awaited before clearing loading state, eliminating UI flicker of admin/floor staff controls.
+- **Fixed Duplicate Auth Initialization:** Removed double-call to `fetchUserDetails` that occurred on app startup.
+
+#### Data Integrity Fixes
+- **Fixed Silent Cascade Delete:** Student deletion now properly throws if deleting related late_comings records fails, preventing orphaned database rows.
+- **Added Duplicate Late Entry Prevention:** Attempting to record the same student as late on the same date now returns a user-friendly error instead of silent duplicates or raw Postgres errors.
+
+#### Performance & Cleanup
+- **Removed Debug Logging:** Removed `console.log` from `useDepartments()` hook.
+- **Fixed Polling Interval:** Removed aggressive real-time subscriptions that caused race conditions; standardized polling to 30-second intervals.
+- **Improved Time Period Filters:** All quick filter buttons (Today, Yesterday, This Week, This Month) now properly highlight when active.
+
+### Known Issues
+- ⚠️ **Session Persistence Broken:** Browser session persistence is temporarily broken in this release. Users must clear cookies/localStorage after logout before logging in again. **Hotfix 1.b.1 is in progress and will be released immediately.**
+
+---
+
 ## [alpha 1.a.3] - 2026-03-03
 
 ### Changed

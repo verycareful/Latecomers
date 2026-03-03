@@ -1,7 +1,8 @@
 # StEAM - Student Time and Attendance Management Portal
 
-**Version:** alpha 1.a.3
+**Version:** alpha 1.b.0
 
+⚠️ **Known Issue:** Session persistence is currently broken in this release. Please clear browser cookies/localStorage after logout before logging in again. This will be fixed in hotfix 1.b.1 coming immediately after.
 
 A modern web application for tracking and managing student time and attendance in educational institutions. Built with React, TypeScript, and Supabase.
 

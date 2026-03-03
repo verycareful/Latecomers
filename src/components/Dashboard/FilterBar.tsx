@@ -40,11 +40,22 @@ export function FilterBar({
 
     for (const qf of QUICK_FILTERS) {
       const range = getDateRangeForPreset(qf.value);
-      if (filters.date) {
+      const rangeStartStr = formatDateToISO(range.start);
+      const rangeEndStr = formatDateToISO(range.end);
+
+      // Check if single date matches this preset's range
+      if (filters.date && !filters.dateRange.start) {
         const dateStr = formatDateToISO(filters.date);
-        const rangeStartStr = formatDateToISO(range.start);
-        const rangeEndStr = formatDateToISO(range.end);
-        if (dateStr >= rangeStartStr && dateStr <= rangeEndStr && qf.value === 'today') {
+        if (dateStr >= rangeStartStr && dateStr <= rangeEndStr) {
+          return qf.value;
+        }
+      }
+
+      // Check if date range matches this preset's range
+      if (filters.dateRange.start && filters.dateRange.end && !filters.date) {
+        const userStartStr = formatDateToISO(filters.dateRange.start);
+        const userEndStr = formatDateToISO(filters.dateRange.end);
+        if (userStartStr === rangeStartStr && userEndStr === rangeEndStr) {
           return qf.value;
         }
       }

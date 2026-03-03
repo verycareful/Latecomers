@@ -14,11 +14,35 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+export const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (typeof window === 'undefined') return null;
+      const item = window.localStorage.getItem(key);
+      if (!item) return null;
+      // Test if it's parseable JSON. If not, this throws an error.
+      JSON.parse(item);
+      return item;
+    } catch (e) {
+      console.warn('Invalid auth token found in storage, clearing it.', e);
+      if (typeof window !== 'undefined') window.localStorage.removeItem(key);
+      return null;
+    }
+  },
+  setItem: (key: string, value: string) => {
+    if (typeof window !== 'undefined') window.localStorage.setItem(key, value);
+  },
+  removeItem: (key: string) => {
+    if (typeof window !== 'undefined') window.localStorage.removeItem(key);
+  },
+};
+
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
+    storage: safeStorage,
   },
 });
 
