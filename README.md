@@ -1,8 +1,6 @@
 # StEAM - Student Time and Attendance Management Portal
 
-**Version:** alpha 1.b.0
-
-⚠️ **Known Issue:** Session persistence is currently broken in this release. Please clear browser cookies/localStorage after logout before logging in again. This will be fixed in hotfix 1.b.1 coming immediately after.
+**Version:** alpha 1.b.1
 
 A modern web application for tracking and managing student time and attendance in educational institutions. Built with React, TypeScript, and Supabase.
 
@@ -10,6 +8,16 @@ A modern web application for tracking and managing student time and attendance i
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
+
+## Release Notes (v1.b.1)
+
+**Hotfix - Session Persistence & Authentication Stack**
+- ✅ **FIXED:** Session persistence - users now remain logged in across page refreshes
+- ✅ **FIXED:** Authentication race condition in `onAuthStateChange`  
+- ✅ **FIXED:** Infinite loading spinner with proper timeout handling
+- ✅ **IMPROVED:** Auth event flow optimization for faster page load
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ## Features
 
