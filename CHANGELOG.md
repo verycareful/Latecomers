@@ -4,6 +4,17 @@ All notable changes to StEAM will be documented here.
 
 ---
 
+## [alpha 1.a.3] - 2026-03-03
+
+### Changed
+- Updated theme color palette with custom CSS variables and Tailwind configuration
+- **Light Mode:** Primary color changed to `#1e3b8a` (Blue), Secondary `#c9fa80` (Lime), Accent `#4ef99e` (Mint)
+- **Dark Mode:** Primary `#1e3b8a` (Blue), Secondary `#8a1313` (Dark Red), Accent `#06b156` (Forest Green)
+- Updated CSS custom properties (`--primary`, `--secondary`, `--accent`, `--text`, `--background`)
+- Extended Tailwind color palette for all theme colors across light and dark modes
+
+---
+
 ## [alpha 1.a.2] - 2026-03-01
 
 ### Removed

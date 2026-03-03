@@ -4,11 +4,21 @@
 
 /* Custom CSS Variables */
 :root {
+  --text: #000000;
+  --background: #ffffff;
+  --primary: #1e3b8a;
+  --secondary: #c9fa80;
+  --accent: #4ef99e;
   --toast-bg: #ffffff;
   --toast-color: #333333;
 }
 
 .dark {
+  --text: #ffffff;
+  --background: #000000;
+  --primary: #1e3b8a;
+  --secondary: #8a1313;
+  --accent: #06b156;
   --toast-bg: #0d0d0d;
   --toast-color: #ffffff;
 }
