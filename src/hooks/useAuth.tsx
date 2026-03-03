@@ -41,17 +41,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const fetchUserDetails = async (userId: string): Promise<UserDetails | null> => {
     try {
-      const { data, error } = await supabase
-        .from('user_details')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      // Create a race between the query and a timeout
+      const queryPromise = (async () => {
+        const { data, error } = await supabase
+          .from('user_details')
+          .select('*')
+          .eq('id', userId);
+        return { data, error };
+      })();
+
+      const timeoutPromise = new Promise<{ data: null; error: { message: string } }>((resolve) =>
+        setTimeout(() => {
+          resolve({ data: null, error: { message: 'Query timeout' } });
+        }, 8000)
+      );
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
 
       if (error) {
         console.error('Error fetching user details:', error);
         return null;
       }
-      return data as UserDetails;
+
+      // No error, but also no data (user hasn't been set up in user_details table yet)
+      if (!data || (Array.isArray(data) && data.length === 0)) {
+        return null;
+      }
+
+      const userDetails = Array.isArray(data) ? data[0] : data;
+      return userDetails as UserDetails;
     } catch (error) {
       console.error('Error fetching user details:', error);
       return null;
@@ -61,15 +79,48 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     let isMounted = true;
 
-    // Safety timeout to ensure loading state clears even if Supabase initialization is delayed or fails silently.
-    const timeoutId = setTimeout(() => {
-      if (isMounted && loading) setLoading(false);
-    }, 5000);
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       if (!isMounted) return;
+
+      // INITIAL_SESSION fires when Supabase restores the persisted session from localStorage
+      // This is the event we rely on for page load restoration. We skip SIGNED_IN
+      // because it fires before the client is fully initialized, causing slow queries.
+      if (event === 'INITIAL_SESSION') {
+        if (currentSession?.user) {
+          setSession(currentSession);
+          setUser({
+            id: currentSession.user.id,
+            email: currentSession.user.email || '',
+            user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
+          });
+          const details = await fetchUserDetails(currentSession.user.id);
+          if (isMounted) setUserDetails(details);
+        }
+        // Always clear loading after INITIAL_SESSION, whether or not a session was found
+        if (isMounted) setLoading(false);
+        return;
+      }
+
+      // SIGNED_IN fires on fresh sign-in. Skip it on page load (INITIAL_SESSION handles that).
+      // Only process it if a session wasn't already restored.
+      if (event === 'SIGNED_IN') {
+        if (!session && currentSession?.user) {
+          setSession(currentSession);
+          setUser({
+            id: currentSession.user.id,
+            email: currentSession.user.email || '',
+            user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
+          });
+          const details = await fetchUserDetails(currentSession.user.id);
+          if (isMounted) {
+            setUserDetails(details);
+            setLoading(false);
+          }
+        }
+        return;
+      }
 
       if (event === 'SIGNED_OUT') {
         setSession(null);
@@ -78,28 +129,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setLoading(false);
         return;
       }
+    });
 
-      if (currentSession?.user) {
-        setSession(currentSession);
-        setUser({
-          id: currentSession.user.id,
-          email: currentSession.user.email || '',
-          user_metadata: currentSession.user.user_metadata as AuthUser['user_metadata'],
-        });
-
-        // Await user details, then clear loading
-        const details = await fetchUserDetails(currentSession.user.id);
-        if (isMounted) {
-          setUserDetails(details);
-          setLoading(false);
-        }
-      } else {
-        setSession(null);
-        setUser(null);
-        setUserDetails(null);
+    // Fallback: if INITIAL_SESSION doesn't fire within 10 seconds, clear loading
+    // (gives Supabase plenty of time to initialize and fire INITIAL_SESSION or SIGNED_IN)
+    const timeoutId = setTimeout(() => {
+      if (isMounted && loading) {
         setLoading(false);
       }
-    });
+    }, 10000);
 
     return () => {
       isMounted = false;

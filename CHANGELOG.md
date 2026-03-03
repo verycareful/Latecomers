@@ -4,6 +4,23 @@ All notable changes to StEAM will be documented here.
 
 ---
 
+## [alpha 1.b.1] - 2026-03-03
+
+### Hotfix: Session Persistence & Authentication Stack
+
+#### Fixed Issues
+- **Fixed Session Persistence:** Browser session storage now properly restored on page load. Users remain logged in across page refreshes.
+- **Fixed Auth State Race Condition:** `INITIAL_SESSION` event is now properly handled to restore persisted sessions from localStorage without hanging.
+- **Fixed Infinite Loading Spinner:** Added 8-second timeout to `fetchUserDetails()` database query and 10-second fallback timeout to prevent indefinite "loading" state.
+- **Optimized Auth Flow:** Prioritize `INITIAL_SESSION` for page load restoration; only process fresh `SIGNED_IN` logins afterward to avoid duplicate slow queries.
+
+#### Technical Details
+- Changed from broken `getSession()` approach to event-driven `onAuthStateChange` with proper `INITIAL_SESSION` handling
+- `fetchUserDetails()` now races database query against 8-second timeout to gracefully handle slow Supabase responses
+- Added 10-second fallback timeout to ensure loading state always clears, even if auth events are delayed
+
+---
+
 ## [alpha 1.b.0] - 2026-03-03
 
 ### Major Security & Stability Fixes (Audit Report Implementation)
@@ -26,9 +43,6 @@ All notable changes to StEAM will be documented here.
 - **Removed Debug Logging:** Removed `console.log` from `useDepartments()` hook.
 - **Fixed Polling Interval:** Removed aggressive real-time subscriptions that caused race conditions; standardized polling to 30-second intervals.
 - **Improved Time Period Filters:** All quick filter buttons (Today, Yesterday, This Week, This Month) now properly highlight when active.
-
-### Known Issues
-- ⚠️ **Session Persistence Broken:** Browser session persistence is temporarily broken in this release. Users must clear cookies/localStorage after logout before logging in again. **Hotfix 1.b.1 is in progress and will be released immediately.**
 
 ---
 
