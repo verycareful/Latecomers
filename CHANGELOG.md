@@ -4,6 +4,23 @@ All notable changes to StEAM will be documented here.
 
 ---
 
+## [1.0.0] - 2026-03-18
+
+### Project Complete
+
+#### Status Update
+- **Project Status:** Marked as complete. No further development planned.
+- **License Change:** Transitioned from Proprietary License to Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+- **Version:** Bumped from alpha 1.b.1 to 1.0.0 (stable release)
+
+#### Notes
+- All planned features implemented and tested
+- StEAM (Student Time and Attendance Management Portal) is ready for production. Although no further updates are planned, the project is open-source under CC BY-NC 4.0, allowing for non-commercial use and modifications with proper attribution. 
+- See CC BY-NC 4.0 license for usage terms
+- Project was not pursued further due to lack of institutional support.
+
+---
+
 ## [alpha 1.b.1] - 2026-03-03
 
 ### Hotfix: Session Persistence & Authentication Stack
