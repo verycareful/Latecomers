@@ -10,16 +10,6 @@ A modern web application for tracking and managing student time and attendance i
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)
 
-## Release Notes (v1.b.1)
-
-**Hotfix - Session Persistence & Authentication Stack**
-- ✅ **FIXED:** Session persistence - users now remain logged in across page refreshes
-- ✅ **FIXED:** Authentication race condition in `onAuthStateChange`  
-- ✅ **FIXED:** Infinite loading spinner with proper timeout handling
-- ✅ **IMPROVED:** Auth event flow optimization for faster page load
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
-
 ## Features
 
 ### Dashboard
