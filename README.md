@@ -1,5 +1,10 @@
-# StEAM - Student Time and Attendance Management Portal
+﻿# StEAM - Student Time and Attendance Management Portal
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![License: Polyform NC](https://img.shields.io/badge/License-Polyform%20NC%201.0.0-blue.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0/)
+[![Status: Active](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)](.)
 **Status:** Complete
 **Version:** 1.0.0
 
@@ -230,7 +235,7 @@ CREATE POLICY "manage_user_details" ON user_details FOR ALL USING (true);
 ### Supabase Auth Settings
 
 For staff user creation to work from the frontend:
-1. Go to **Authentication → Providers → Email**
+1. Go to **Authentication â†’ Providers â†’ Email**
 2. **Disable** "Confirm email" to allow immediate user creation
 
 ## Scripts
@@ -246,41 +251,41 @@ For staff user creation to work from the frontend:
 
 ```
 src/
-├── components/
-│   ├── Admin/          # Admin panel components
-│   │   ├── AdminPanel.tsx
-│   │   ├── StaffManagement.tsx
-│   │   ├── StaffEditModal.tsx
-│   │   ├── StudentManagement.tsx
-│   │   └── StudentEditModal.tsx
-│   ├── Auth/           # Login and protected routes
-│   ├── Dashboard/      # Main dashboard components
-│   │   ├── Dashboard.tsx
-│   │   ├── FilterBar.tsx
-│   │   ├── LateComersTable.tsx
-│   │   ├── StatsCards.tsx
-│   │   ├── StudentDetailsModal.tsx
-│   │   ├── StudentSearch.tsx
-│   │   └── AddLateEntryModal.tsx
-│   ├── Layout/         # App layout and header
-│   ├── Shared/         # Reusable components
-│   └── Students/       # All students page
-├── hooks/              # Custom React hooks
-│   ├── useAuth.tsx
-│   ├── useAdmin.ts
-│   ├── useLateComers.ts
-│   ├── useStudentDetails.ts
-│   └── useTheme.tsx
-├── lib/                # External service clients
-│   └── supabase.ts
-├── types/              # TypeScript type definitions
-│   └── database.types.ts
-├── utils/              # Utility functions
-│   ├── dateHelpers.ts
-│   └── helpers.ts
-├── App.tsx             # Main app with routing
-├── main.tsx            # Entry point
-└── index.css           # Global styles
+â”œâ”€â”€ components/
+â”‚   â”œâ”€â”€ Admin/          # Admin panel components
+â”‚   â”‚   â”œâ”€â”€ AdminPanel.tsx
+â”‚   â”‚   â”œâ”€â”€ StaffManagement.tsx
+â”‚   â”‚   â”œâ”€â”€ StaffEditModal.tsx
+â”‚   â”‚   â”œâ”€â”€ StudentManagement.tsx
+â”‚   â”‚   â””â”€â”€ StudentEditModal.tsx
+â”‚   â”œâ”€â”€ Auth/           # Login and protected routes
+â”‚   â”œâ”€â”€ Dashboard/      # Main dashboard components
+â”‚   â”‚   â”œâ”€â”€ Dashboard.tsx
+â”‚   â”‚   â”œâ”€â”€ FilterBar.tsx
+â”‚   â”‚   â”œâ”€â”€ LateComersTable.tsx
+â”‚   â”‚   â”œâ”€â”€ StatsCards.tsx
+â”‚   â”‚   â”œâ”€â”€ StudentDetailsModal.tsx
+â”‚   â”‚   â”œâ”€â”€ StudentSearch.tsx
+â”‚   â”‚   â””â”€â”€ AddLateEntryModal.tsx
+â”‚   â”œâ”€â”€ Layout/         # App layout and header
+â”‚   â”œâ”€â”€ Shared/         # Reusable components
+â”‚   â””â”€â”€ Students/       # All students page
+â”œâ”€â”€ hooks/              # Custom React hooks
+â”‚   â”œâ”€â”€ useAuth.tsx
+â”‚   â”œâ”€â”€ useAdmin.ts
+â”‚   â”œâ”€â”€ useLateComers.ts
+â”‚   â”œâ”€â”€ useStudentDetails.ts
+â”‚   â””â”€â”€ useTheme.tsx
+â”œâ”€â”€ lib/                # External service clients
+â”‚   â””â”€â”€ supabase.ts
+â”œâ”€â”€ types/              # TypeScript type definitions
+â”‚   â””â”€â”€ database.types.ts
+â”œâ”€â”€ utils/              # Utility functions
+â”‚   â”œâ”€â”€ dateHelpers.ts
+â”‚   â””â”€â”€ helpers.ts
+â”œâ”€â”€ App.tsx             # Main app with routing
+â”œâ”€â”€ main.tsx            # Entry point
+â””â”€â”€ index.css           # Global styles
 ```
 
 ## Configuration
@@ -328,13 +333,16 @@ This project is currently under restricted use for educational institution integ
 
 ## License
 
-This project is licensed under a restricted license. See the [LICENSE](LICENSE) file for details.
+Copyright © 2026 Sricharan Suresh (github.com/verycareful)
 
-**Usage Restrictions:**
-- This software is developed for educational institution use
-- Commercial use, redistribution, or modification without explicit permission is prohibited
-- Contact the maintainer for licensing inquiries
+This project is licensed under the **[Polyform Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)**.
+You may use, copy, and modify this software for non-commercial purposes only.
+Commercial use of any kind is prohibited without explicit written permission from the author.
 
+See the [LICENSE](LICENSE) file for the full license text, or visit
+[https://polyformproject.org/licenses/noncommercial/1.0.0/](https://polyformproject.org/licenses/noncommercial/1.0.0/).
+
+For commercial licensing inquiries, contact [sricharanc03@gmail.com](mailto:sricharanc03@gmail.com).
 ## Support
 
 For issues and feature requests, please use the [GitHub Issues](https://github.com/verycareful/Latecomers/issues) page.
@@ -345,3 +353,4 @@ For issues and feature requests, please use the [GitHub Issues](https://github.c
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
 - Backend powered by [Supabase](https://supabase.com/)
 - Icons from [Heroicons](https://heroicons.com/)
+

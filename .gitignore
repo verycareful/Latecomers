@@ -45,3 +45,6 @@ database/
 
 # Supabase local config
 supabase/.temp/
+
+#Other
+audit-report-1.md
