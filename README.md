@@ -1,5 +1,10 @@
 # StEAM - Student Time and Attendance Management Portal
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![License: Polyform NC](https://img.shields.io/badge/License-Polyform%20NC%201.0.0-blue.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0/)
+[![Status: Active](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)](.)
 **Status:** Complete
 **Version:** 1.0.0
 
@@ -328,13 +333,16 @@ This project is currently under restricted use for educational institution integ
 
 ## License
 
-This project is licensed under a restricted license. See the [LICENSE](LICENSE) file for details.
+Copyright © 2026 Sricharan Suresh (github.com/verycareful)
 
-**Usage Restrictions:**
-- This software is developed for educational institution use
-- Commercial use, redistribution, or modification without explicit permission is prohibited
-- Contact the maintainer for licensing inquiries
+This project is licensed under the **[Polyform Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/)**.
+You may use, copy, and modify this software for non-commercial purposes only.
+Commercial use of any kind is prohibited without explicit written permission from the author.
 
+See the [LICENSE](LICENSE) file for the full license text, or visit
+[https://polyformproject.org/licenses/noncommercial/1.0.0/](https://polyformproject.org/licenses/noncommercial/1.0.0/).
+
+For commercial licensing inquiries, contact [sricharanc03@gmail.com](mailto:sricharanc03@gmail.com).
 ## Support
 
 For issues and feature requests, please use the [GitHub Issues](https://github.com/verycareful/Latecomers/issues) page.
