@@ -1,10 +1,21 @@
 # StEAM - Student Time and Attendance Management Portal
+<!-- Language & framework -->
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-
+[![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![React Router](https://img.shields.io/badge/React%20Router-6.21.1-CA4245?style=flat-square&logo=reactrouter&logoColor=white)](https://reactrouter.com/)
+<!-- State & forms -->
+[![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.17-FF4154?style=flat-square&logo=reactquery&logoColor=white)](https://tanstack.com/query/)
+[![React Hook Form](https://img.shields.io/badge/React%20Hook%20Form-7.49.2-EC5990?style=flat-square&logo=reacthookform&logoColor=white)](https://react-hook-form.com/)
+<!-- Data & UX -->
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![SheetJS](https://img.shields.io/badge/SheetJS%20xlsx-0.18.5-217346?style=flat-square&logo=microsoftexcel&logoColor=white)](https://sheetjs.com/)
+[![date-fns](https://img.shields.io/badge/date--fns-3.2-770C56?style=flat-square)](https://date-fns.org/)
+[![react-dropzone](https://img.shields.io/badge/react--dropzone-14.4-1F6FEB?style=flat-square)](https://react-dropzone.js.org/)
+[![react-hot-toast](https://img.shields.io/badge/react--hot--toast-2.4.1-FF4B4B?style=flat-square)](https://react-hot-toast.com/)
+<!-- Project -->
+[![Version](https://img.shields.io/badge/version-1.b.1-c8a96e?style=flat-square)](package.json)
 [![License: Polyform NC](https://img.shields.io/badge/License-Polyform%20NC%201.0.0-blue.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0/)
-[![Status: Active](https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square)](.)
+[![Status: Archived](https://img.shields.io/badge/Status-Archived-lightgrey?style=flat-square)](.)
 
 **Status:** Complete
 **Version:** 1.0.0
